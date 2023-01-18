@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "simple-aws"
+version = "0.1.0"
+description = ""
+authors = ["Gustavo Correa <self.gustavocorrea@gmail.com>"]
+readme = "README.md"
+packages = [{include = "simple_aws"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
