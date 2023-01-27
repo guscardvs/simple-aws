@@ -1,2 +1,2 @@
 # simple-aws
-Asyncio-compatible python library to interact with aws without magic
+Simple-aws is a library to interact with the AWS API without magic

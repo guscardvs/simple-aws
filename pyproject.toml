@@ -1,15 +1,55 @@
 [tool.poetry]
 name = "simple-aws"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = ["Gustavo Correa <self.gustavocorrea@gmail.com>"]
 readme = "README.md"
-packages = [{include = "simple_aws"}]
+packages = [{ include = "simple_aws" }]
+
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
+
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
+requests = "^2.28.2"
+gyver = "^0.19.1"
+furl = "^2.1.3"
 
+
+[tool.poetry.group.lint.dependencies]
+black = "^22.12.0"
+isort = "^5.11.4"
+autoflake = "^2.0.0"
+flake8 = "^6.0.0"
+
+
+[tool.poetry.group.prof.dependencies]
+pyinstrument = "^4.4.0"
+
+
+[tool.poetry.group.build.dependencies]
+poetry-dynamic-versioning = "^0.21.3"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.1"
+
+
+[tool.poetry.group.compare.dependencies]
+aioaws = "^0.14"
+
+[tool.black]
+line_length = 79
+
+[tool.isort]
+profile = 'black'
+line_length = 79
+force_single_line = true
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"

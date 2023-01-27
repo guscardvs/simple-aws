@@ -1,0 +1,9 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "$version"
+annotated_tag = true
+version_files = [
+    "simple_aws.__init__.py:__version__",
+    "pyproject.toml:__version__",
+]
