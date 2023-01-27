@@ -2,6 +2,7 @@ import hashlib
 import hmac
 from base64 import b64encode
 from binascii import hexlify
+from dataclasses import dataclass
 from datetime import date
 from datetime import datetime
 from datetime import timezone
@@ -22,16 +23,11 @@ AWS_ALGORITHM = "AWS4-HMAC-SHA256"
 AWS_REQUEST = "aws4_request"
 
 
+@dataclass(frozen=True)
 class AwsAuthV4:
-    def __init__(
-        self,
-        credentials: Credentials,
-        service: str,
-        use_default_headers: bool = True,
-    ) -> None:
-        self.credentials = credentials
-        self.service = service
-        self.use_default_headers = use_default_headers
+    credentials: Credentials
+    service: str
+    use_default_headers: bool = True
 
     def headers(
         self,

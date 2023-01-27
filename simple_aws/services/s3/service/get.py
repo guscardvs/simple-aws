@@ -8,19 +8,20 @@ from furl.furl import furl
 
 from simple_aws.auth import AWS_ALGORITHM
 from simple_aws.auth import amz_dateformat
-from simple_aws.exc import InvalidParam, NotFound
+from simple_aws.exc import InvalidParam
+from simple_aws.exc import NotFound
 from simple_aws.exc import RequestFailed
-from simple_aws.services.s3.models import FileInfo, StorageClass
+from simple_aws.services.s3.models import FileInfo
 from simple_aws.typedef import METHODS
 
-from .handle_object import S3Core
+from .core import S3Core
 
 DAY = 86400
 WEEK = 604800
 
 
 @dataclass(frozen=True)
-class HandleObject:
+class Get:
     core: S3Core
     object_name: str
     version: Optional[str] = None
@@ -30,12 +31,12 @@ class HandleObject:
         return self.core.aws_auth
 
     def new_url(self):
-        return self.core.base_uri.copy().add(path=self.object_name)
+        return self.core.get_uri_copy().add(path=self.object_name)
 
     def download(self):
         url = self.presigned_url(expires=30)
         with self.core.context.begin() as client:
-            response = client.get(url)
+            response = client.get(url, raw=True)
             if not response.ok:
                 raise RequestFailed(response)
             return response.content
@@ -47,11 +48,8 @@ class HandleObject:
         return str(url)
 
     def info(self):
-        url = str(self.new_url())
         with self.core.context.begin() as client:
-            response = client.head(
-                url, headers=self.aws_auth.headers("HEAD", url)
-            )
+            response = client.head(self.new_url())
             if not response.ok:
                 if response.status_code == HTTPStatus.NOT_FOUND:
                     raise NotFound(self.object_name, "s3")

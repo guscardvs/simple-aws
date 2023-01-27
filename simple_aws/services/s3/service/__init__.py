@@ -1,3 +1,4 @@
+from .delete import ObjectTuple
 from .service import S3Service
 
-__all__ = ["S3Service"]
+__all__ = ["S3Service", "ObjectTuple"]

@@ -16,7 +16,7 @@ from simple_aws.auth import amz_dateformat
 from simple_aws.exc import RequestFailed
 from simple_aws.services.s3.models import UploadParams
 
-from .handle_object import S3Core
+from .core import S3Core
 
 DEFAULT_MIMETYPE = "application/octet-stream"
 
@@ -57,7 +57,10 @@ class Upload:
         )
         with self.core.context.begin() as client:
             response = client.post(
-                str(self.core.base_uri), fields, files={"file": self.content}
+                str(self.core.base_uri),
+                fields,
+                files={"file": self.content},
+                raw=True,
             )
             if response.status_code != HTTPStatus.NO_CONTENT:
                 raise RequestFailed(response)

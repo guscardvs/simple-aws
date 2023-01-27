@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 from typing import Optional
-from xml.etree import ElementTree
+from xml.etree import ElementTree as ET
 
 from furl.furl import furl
 
@@ -9,17 +9,17 @@ from simple_aws.exc import InvalidParam
 from simple_aws.exc import RequestFailed
 from simple_aws.exc import UnexpectedResponse
 from simple_aws.services.s3.models import FileInfo
+from simple_aws.utils import xmlns
 
-from .handle_object import S3Core
+from .core import S3Core
 
 MAX_CHUNKSIZE = 1000
 
-xmlns = "http://s3.amazonaws.com/doc/2006-03-01/"
 xmlns_re = re.compile(f' xmlns="{re.escape(xmlns)}"'.encode())
 
 
 @dataclass(frozen=True)
-class ListObjects:
+class List:
     core: S3Core
     prefix: Optional[str] = None
     chunksize: int = MAX_CHUNKSIZE
@@ -34,7 +34,7 @@ class ListObjects:
             )
 
     def new_url(self):
-        return self.core.base_uri.copy().add(
+        return self.core.get_uri_copy().add(
             {"list-type": 2, "max-keys": self.chunksize}
         )
 
@@ -57,23 +57,17 @@ class ListObjects:
                 str_url = self._prepare_url(base_url, continuation_token)
                 response = client.get(
                     str_url,
-                    headers=self.aws_auth.headers(
-                        "GET",
-                        str_url,
-                    ),
                 )
                 if not response.ok:
                     raise RequestFailed(response)
-                xml_content = ElementTree.fromstring(
+                xml_content = ET.fromstring(
                     xmlns_re.sub(b"", response.content)
                 )
                 for contents in xml_content.findall("Contents"):
                     yield FileInfo.parse_obj(
                         {items.tag: items.text for items in contents}
                     )
-                if (
-                    t := xml_content.find("IsTruncated")
-                ) is not None and t.text == "false":
+                if self._list_is_exhausted(xml_content):
                     break
                 if (
                     t := xml_content.find("NextContinuationToken")
@@ -81,6 +75,11 @@ class ListObjects:
                     continuation_token = t.text
                 else:
                     raise UnexpectedResponse("unexpected response from S3")
+
+    def _list_is_exhausted(self, xml_content: ET.Element):
+        return (
+            t := xml_content.find("IsTruncated")
+        ) is not None and t.text == "false"
 
     def _prepare_url(
         self,
