@@ -10,7 +10,9 @@ from typing_extensions import ParamSpec
 
 from simple_aws.config import make_default_factory
 from simple_aws.credentials import Credentials
-from simple_aws.services.s3.config import S3Config
+from simple_aws.services.s3.config import S3ObjectConfig
+from simple_aws.services.s3.object.copy import Copy
+from simple_aws.services.s3.object.copy import CopyParams
 
 from .core import S3Core
 from .delete import DeleteMany
@@ -26,9 +28,11 @@ T = TypeVar("T")
 
 
 @dataclass(frozen=True)
-class S3Service:
+class S3Object:
     credentials: Credentials
-    config: S3Config = field(default_factory=make_default_factory(S3Config))
+    config: S3ObjectConfig = field(
+        default_factory=make_default_factory(S3ObjectConfig)
+    )
 
     @lazyfield
     def core(self):
@@ -94,3 +98,44 @@ class S3Service:
         self, object_name: str, version: Optional[str] = None
     ):
         return self.build(Get, object_name, version)
+
+    def copy(
+        self, source: CopyParams, target: CopyParams, prevalidate: bool = True
+    ):
+        return self.build(Copy, prevalidate).copy(source, target)
+
+    def copy_from(
+        self,
+        source: CopyParams,
+        target_name: Optional[str] = None,
+        prevalidate: bool = True,
+    ):
+        return self.build(Copy, prevalidate).copy_from(source, target_name)
+
+    def copy_to(
+        self,
+        target: CopyParams,
+        source_name: Optional[str] = None,
+        prevalidate: bool = True,
+    ):
+        return self.build(Copy, prevalidate).copy_to(target, source_name)
+
+    def move(
+        self, object_name: str, destination: str, prevalidate: bool = True
+    ):
+        """Move an object inside the same bucket
+        destination and object_name must be the full object path"""
+        with self.core.context.open():
+            self.copy_in_bucket(object_name, destination, prevalidate)
+            self.delete(object_name)
+
+    def copy_in_bucket(
+        self, object_name: str, destination: str, prevalidate: bool = True
+    ):
+        """Copy an object inside the same bucket
+        destination and object_name must be the full object path"""
+        self.copy_to(
+            CopyParams(destination, self.core.config.bucket_name),
+            object_name,
+            prevalidate,
+        )

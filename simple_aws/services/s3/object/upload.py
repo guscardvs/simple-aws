@@ -57,7 +57,7 @@ class Upload:
         )
         with self.core.context.begin() as client:
             response = client.post(
-                str(self.core.base_uri),
+                self.core.base_uri,
                 fields,
                 files={"file": self.content},
                 raw=True,

@@ -32,9 +32,11 @@ class ServiceFactory:
     ) -> T:
         return service_class(self.credentials, *args, **kwargs)
 
-    def s3(self, config: Optional[s3.S3Config] = None) -> s3.S3Service:
+    def s3_object(
+        self, config: Optional[s3.S3ObjectConfig] = None
+    ) -> s3.S3Object:
         return self.build(
-            s3.S3Service, config=self.get_or_load(s3.S3Config, config)
+            s3.S3Object, config=self.get_or_load(s3.S3ObjectConfig, config)
         )
 
     def get_or_load(

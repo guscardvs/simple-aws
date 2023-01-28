@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from dataclasses import field
 
-from furl.furl import furl
 from gyver.context import Context
+from gyver.url import URL
 from gyver.utils import lazyfield
 
 from simple_aws.auth import AwsAuthV4
@@ -10,7 +10,7 @@ from simple_aws.config import make_default_factory
 from simple_aws.credentials import Credentials
 from simple_aws.http import AuthHttpAdapter
 from simple_aws.http import AuthHttpClient
-from simple_aws.services.s3.config import S3Config
+from simple_aws.services.s3.config import S3ObjectConfig
 
 HOST_TEMPLATE = "https://{bucket}.s3.{region}.amazonaws.com"
 SERVICE_NAME = "s3"
@@ -19,11 +19,13 @@ SERVICE_NAME = "s3"
 @dataclass(frozen=True)
 class S3Core:
     credentials: Credentials
-    config: S3Config = field(default_factory=make_default_factory(S3Config))
+    config: S3ObjectConfig = field(
+        default_factory=make_default_factory(S3ObjectConfig)
+    )
 
     @lazyfield
-    def base_uri(self) -> furl:
-        return furl(
+    def base_uri(self) -> URL:
+        return URL(
             HOST_TEMPLATE.format(
                 bucket=self.config.bucket_name, region=self.credentials.region
             )

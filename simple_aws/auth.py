@@ -9,10 +9,8 @@ from datetime import timezone
 from functools import reduce
 from typing import Mapping
 from typing import Optional
-from typing import Union
-from urllib.parse import quote
 
-from furl.furl import furl
+from gyver.url import URL
 
 from simple_aws.typedef import METHODS
 
@@ -32,7 +30,7 @@ class AwsAuthV4:
     def headers(
         self,
         method: METHODS,
-        url: str,
+        url: URL,
         *,
         headers: Optional[Mapping[str, str]] = None,
         data: Optional[bytes] = None,
@@ -42,14 +40,13 @@ class AwsAuthV4:
         now = now or datetime.now(timezone.utc)
         data = data or b""
         content_type = content_type or CONTENT_TYPE
-        f_url = furl(url)
         payload_hash = self.hash_payload(data)
         headers = self._base_headers(
-            f_url, headers or {}, data, content_type, now
+            url, headers or {}, data, content_type, now
         )
 
         signed_headers, signature = self.make_signature(
-            method, f_url, payload_hash, now, headers
+            method, url, payload_hash, now, headers
         )
         credential = self.make_credential(now)
         authorization_header = (
@@ -68,16 +65,15 @@ class AwsAuthV4:
     def make_signature(
         self,
         method: METHODS,
-        url: Union[str, furl],
+        url: URL,
         payload_hash: str,
         now: datetime,
         headers: Optional[Mapping[str, str]] = None,
     ) -> tuple[str, str]:
-        f_url = furl(url) if isinstance(url, str) else url.copy()
         now = now
         headers = headers or {}
         signed_headers, canonical_request = self._get_canonical_request(
-            method, f_url, headers, payload_hash
+            method, url, headers, payload_hash
         )
         signed_string = self._create_sign_string(
             now, hashlib.sha256(canonical_request.encode()).hexdigest()
@@ -86,14 +82,14 @@ class AwsAuthV4:
 
     def _base_headers(
         self,
-        url: furl,
+        url: URL,
         headers: Mapping[str, str],
         data: bytes,
         content_type: str,
         now: datetime,
     ):
         base_headers = {
-            "host": url.host,
+            "host": url.netloc.encode(),
             "x-amz-date": amz_dateformat(now),
         }
         if self.use_default_headers:
@@ -107,7 +103,7 @@ class AwsAuthV4:
     def _get_canonical_request(
         self,
         method: METHODS,
-        url: furl,
+        url: URL,
         headers: Mapping[str, str],
         payload_hash: str,
     ) -> tuple[str, str]:
@@ -116,11 +112,8 @@ class AwsAuthV4:
         return signed_headers, "\n".join(
             (
                 method,
-                quote(str(url.path) or "/"),
-                "&".join(
-                    "=".join((quote(key), quote(value or "", safe="")))
-                    for key, value in url.query.params.iteritems()
-                ),
+                url.path.encode(),
+                url.query.encode(),
                 "\n".join(
                     ":".join((str.lower(key), str.strip(headers[key])))
                     for key in header_keys

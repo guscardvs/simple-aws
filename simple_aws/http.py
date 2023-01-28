@@ -7,8 +7,8 @@ from typing import Union
 from typing import overload
 
 import requests
-from furl.furl import furl
 from gyver.context import Adapter
+from gyver.url import URL
 from gyver.utils import lazyfield
 
 from simple_aws.auth import AwsAuthV4
@@ -47,7 +47,7 @@ class AuthHttpClient:
 
     def head(
         self,
-        url: Union[furl, str],
+        url: URL,
         headers: Optional[Mapping[str, str]] = None,
         raw: bool = False,
     ):
@@ -55,13 +55,13 @@ class AuthHttpClient:
         headers = (
             headers
             if raw
-            else self.aws_auth.headers("HEAD", str(url), headers=headers)
+            else self.aws_auth.headers("HEAD", url, headers=headers)
         )
-        return self.session.head(str(url), headers=headers)
+        return self.session.head(url.encode(), headers=headers)
 
     def get(
         self,
-        url: Union[furl, str],
+        url: URL,
         headers: Optional[Mapping[str, str]] = None,
         raw: bool = False,
     ):
@@ -69,14 +69,14 @@ class AuthHttpClient:
         headers = (
             headers
             if raw
-            else self.aws_auth.headers("GET", str(url), headers=headers)
+            else self.aws_auth.headers("GET", url, headers=headers)
         )
-        return self.session.get(str(url), headers=headers)
+        return self.session.get(url.encode(), headers=headers)
 
     @overload
     def post(
         self,
-        url: Union[furl, str],
+        url: URL,
         data: bytes = b"",
         headers: Optional[Mapping[str, str]] = None,
         files: Optional[Mapping[str, bytes]] = None,
@@ -87,7 +87,7 @@ class AuthHttpClient:
     @overload
     def post(
         self,
-        url: Union[furl, str],
+        url: URL,
         data: Mapping[str, Any],
         headers: Optional[Mapping[str, str]] = None,
         files: Optional[Mapping[str, bytes]] = None,
@@ -98,7 +98,7 @@ class AuthHttpClient:
 
     def post(
         self,
-        url: Union[furl, str],
+        url: URL,
         data: Union[bytes, Mapping[str, Any]] = b"",
         headers: Optional[Mapping[str, str]] = None,
         files: Optional[Mapping[str, bytes]] = None,
@@ -111,10 +111,31 @@ class AuthHttpClient:
                     "data", data, "Requests using data as mapping must be raw"
                 )
             headers = self.aws_auth.headers(
-                "POST", str(url), headers=headers, data=data
+                "POST", url, headers=headers, data=data
             )
         return self.session.post(
-            str(url), data=data, headers=headers, files=files
+            url.encode(), data=data, headers=headers, files=files
+        )
+
+    def put(
+        self,
+        url: URL,
+        data: Union[bytes, Mapping[str, Any]] = b"",
+        headers: Optional[Mapping[str, str]] = None,
+        files: Optional[Mapping[str, bytes]] = None,
+        raw: bool = False,
+    ):
+        headers = headers or {}
+        if not raw:
+            if not isinstance(data, bytes):
+                raise InvalidParam(
+                    "data", data, "Requests using data as mapping must be raw"
+                )
+            headers = self.aws_auth.headers(
+                "PUT", url, headers=headers, data=data
+            )
+        return self.session.put(
+            url.encode(), data=data, headers=headers, files=files
         )
 
 

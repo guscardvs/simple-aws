@@ -1,7 +1,13 @@
-from .config import S3Config
+from .config import S3ObjectConfig
 from .models import FileInfo
 from .models import StorageClass
-from .service import ObjectTuple
-from .service import S3Service
+from .object import ObjectTuple
+from .object import S3Object
 
-__all__ = ["S3Config", "S3Service", "ObjectTuple", "StorageClass", "FileInfo"]
+__all__ = [
+    "S3ObjectConfig",
+    "S3Object",
+    "ObjectTuple",
+    "StorageClass",
+    "FileInfo",
+]

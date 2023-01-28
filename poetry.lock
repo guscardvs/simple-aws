@@ -273,18 +273,6 @@ files = [
 ]
 
 [[package]]
-name = "context-handler"
-version = "5.1.0"
-description = ""
-category = "main"
-optional = false
-python-versions = ">=3.9,<4.0"
-files = [
-    {file = "context_handler-5.1.0-py3-none-any.whl", hash = "sha256:50526466f0065eabc3ebdd303737f6fe0c5b86a230048c13dfc769efabef3a24"},
-    {file = "context_handler-5.1.0.tar.gz", hash = "sha256:4c21135effb7bdedcbdcbd1db67dc5d5b983e966cf6cad758313457c9d5e046a"},
-]
-
-[[package]]
 name = "cryptography"
 version = "38.0.4"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
@@ -416,36 +404,19 @@ pycodestyle = ">=2.10.0,<2.11.0"
 pyflakes = ">=3.0.0,<3.1.0"
 
 [[package]]
-name = "furl"
-version = "2.1.3"
-description = "URL manipulation made simple."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "furl-2.1.3-py2.py3-none-any.whl", hash = "sha256:9ab425062c4217f9802508e45feb4a83e54324273ac4b202f1850363309666c0"},
-    {file = "furl-2.1.3.tar.gz", hash = "sha256:5a6188fe2666c484a12159c18be97a1977a71d632ef5bb867ef15f54af39cc4e"},
-]
-
-[package.dependencies]
-orderedmultidict = ">=1.0.1"
-six = ">=1.8.0"
-
-[[package]]
 name = "gyver"
-version = "0.19.1"
+version = "0.21.0"
 description = "Toolbox for web development"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "gyver-0.19.1-py3-none-any.whl", hash = "sha256:9ca52390050fd4f004845791ba752742f5955bd8fbbd0eb8c5696c29c64cddd3"},
-    {file = "gyver-0.19.1.tar.gz", hash = "sha256:6c38ac1729bc01e88ccfd413a67a284eafaf1b69d95b11b2c16ce0b96eddaa18"},
+    {file = "gyver-0.21.0-py3-none-any.whl", hash = "sha256:acdae69ac6df177161b3e58b84f96b5dabcda02ebab50017353e012b268035e9"},
+    {file = "gyver-0.21.0.tar.gz", hash = "sha256:70d8b9cb398cdf24104ef9f6dfffaf043fec5a56c4317dd745c5f8806c40ac31"},
 ]
 
 [package.dependencies]
 aiomysql = ">=0.1.1,<0.2.0"
-context-handler = ">=5.1.0,<6.0.0"
 cryptography = ">=38.0.4,<39.0.0"
 orjson = ">=3.8.1,<4.0.0"
 pydantic = {version = ">=1.10.2,<2.0.0", extras = ["email"]}
@@ -661,21 +632,6 @@ files = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
-
-[[package]]
-name = "orderedmultidict"
-version = "1.0.1"
-description = "Ordered Multivalue Dictionary"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "orderedmultidict-1.0.1-py2.py3-none-any.whl", hash = "sha256:43c839a17ee3cdd62234c47deca1a8508a3f2ca1d0678a3bf791c87cf84adbf3"},
-    {file = "orderedmultidict-1.0.1.tar.gz", hash = "sha256:04070bbb5e87291cc9bfa51df413677faf2141c73c61d2a5f7b26bea3cd882ad"},
-]
-
-[package.dependencies]
-six = ">=1.8.0"
 
 [[package]]
 name = "orjson"
@@ -1041,18 +997,6 @@ idna = {version = "*", optional = true, markers = "extra == \"idna2008\""}
 idna2008 = ["idna"]
 
 [[package]]
-name = "six"
-version = "1.16.0"
-description = "Python 2 and 3 compatibility utilities"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
-    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
-]
-
-[[package]]
 name = "sniffio"
 version = "1.3.0"
 description = "Sniff out which async library your code is running under"
@@ -1132,4 +1076,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "6c2c7d550ea7cab69c3ee50b156c0aaf946a6588e5c21d5ffae2dc47cf7edd17"
+content-hash = "ffb452f65256cba9496f9c01355747678e6733d086ddd40bed7bd5ffa6916c8d"

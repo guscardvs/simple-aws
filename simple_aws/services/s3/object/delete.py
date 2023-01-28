@@ -24,7 +24,7 @@ class DeleteMany:
     objects: Sequence[ObjectTuple]
 
     def delete(self):
-        url = str(self.core.get_uri_copy().add({"delete": None}, path="/"))
+        url = self.core.get_uri_copy().add({"delete": ""}, path="/")
         payload = self._build_payload()
 
         with self.core.context.begin() as client:

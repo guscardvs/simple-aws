@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Optional
 from xml.etree import ElementTree as ET
 
-from furl.furl import furl
+from gyver.url import URL
 
 from simple_aws.exc import InvalidParam
 from simple_aws.exc import RequestFailed
@@ -35,7 +35,7 @@ class List:
 
     def new_url(self):
         return self.core.get_uri_copy().add(
-            {"list-type": 2, "max-keys": self.chunksize}
+            {"list-type": "2", "max-keys": str(self.chunksize)}, path="/"
         )
 
     @property
@@ -54,11 +54,12 @@ class List:
         continuation_token = None
         with self.context.begin() as client:
             while True:
-                str_url = self._prepare_url(base_url, continuation_token)
+                url = self._prepare_url(base_url, continuation_token)
                 response = client.get(
-                    str_url,
+                    url,
                 )
                 if not response.ok:
+                    print(response.text)
                     raise RequestFailed(response)
                 xml_content = ET.fromstring(
                     xmlns_re.sub(b"", response.content)
@@ -83,7 +84,7 @@ class List:
 
     def _prepare_url(
         self,
-        base_url: furl,
+        base_url: URL,
         continuation_token: Optional[str],
     ):
         url = base_url.copy()
@@ -92,4 +93,4 @@ class List:
             url.add({"prefix": prefix})
         if continuation_token:
             url.add({"continuation-token": continuation_token})
-        return str(url)
+        return url

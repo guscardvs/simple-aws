@@ -4,7 +4,7 @@ from datetime import timezone
 from http import HTTPStatus
 from typing import Optional
 
-from furl.furl import furl
+from gyver.url import URL
 
 from simple_aws.auth import AWS_ALGORITHM
 from simple_aws.auth import amz_dateformat
@@ -45,7 +45,7 @@ class Get:
         url = self._append_get_object_params("GET", expires)
         if self.version:
             url.add({"v": self.version})
-        return str(url)
+        return url
 
     def info(self):
         with self.core.context.begin() as client:
@@ -75,7 +75,7 @@ class Get:
         self,
         method: METHODS,
         expires: int,
-    ) -> furl:
+    ) -> URL:
         if not 1 <= expires <= WEEK:
             raise InvalidParam(
                 "expires",
@@ -83,8 +83,7 @@ class Get:
                 f"Expires must be greater than 1 and lower than a {WEEK=}",
             )
         timestamp = datetime.now(timezone.utc)
-        url = self.new_url()
-        url.add(
+        url = self.new_url().add(
             {
                 "X-Amz-Algorithm": AWS_ALGORITHM,
                 "X-Amz-Credential": self.aws_auth.make_credential(timestamp),
@@ -95,10 +94,10 @@ class Get:
         )
         _, signature = self.aws_auth.make_signature(
             method,
-            str(url),
+            url,
             "UNSIGNED-PAYLOAD",
             timestamp,
-            {"host": str(url.host)},
+            {"host": url.netloc.encode()},
         )
         url.add({"X-Amz-Signature": signature})
         return url
